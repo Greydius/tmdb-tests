@@ -1,32 +1,75 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <a-layout id="layout">
+    <a-layout-header class="header">
+      <div class="logo">
+        IMDb
+      </div>
+      <a-menu
+        theme="dark"
+        mode="horizontal"
+        :style="{ lineHeight: '64px' }"
+        :selectedKeys="[menuCurrentKey]"
+        @click="handleMenuChange"
+      >
+        <a-menu-item key="home">Главная</a-menu-item>
+        <a-menu-item key="favorites">Избранное</a-menu-item>
+      </a-menu>
+    </a-layout-header>
+    <a-layout>
+      <a-layout-content class="content">
+        <router-view></router-view>
+      </a-layout-content>
+    </a-layout>
+  </a-layout>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<style lang="scss" scoped>
+#layout {
+  min-height: 100vh;
+}
+.logo {
+  float: left;
+  color: #fff;
+  font-size: 30px;
+  margin-right: 60px;
 }
 
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.content {
+  padding: 20px;
 }
 </style>
+
+<script>
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapActions: mapMoviesActions } = createNamespacedHelpers('movies')
+const { mapMutations: mapFavoritesMutations } = createNamespacedHelpers('favorites')
+
+export default {
+  data(){
+    return {
+
+    }
+  },
+  computed: {
+    menuCurrentKey(){
+      return this.$route.name || 'home'
+    }
+  },
+  methods: {
+    handleMenuChange({key}){
+      this.$router.push({name: key})
+    },
+    ...mapMoviesActions({
+      getMovies: 'get'
+    }),
+    ...mapFavoritesMutations({
+      getFavorites: 'read'
+    })
+  },
+  mounted(){
+    this.getFavorites()
+    this.getMovies()
+  }
+}
+</script>
